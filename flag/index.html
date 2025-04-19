@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #cont{
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: auto;
+            gap: 50px;
+        }
+        img{
+            width: 260px;
+            height: 150px;
+        }
+
+        #cont div{
+            padding: 10px;
+            margin: 10px;
+            box-shadow: rgba(3, 102, 214, 0.3) 0px 0px 0px 3px;
+        }
+
+        .dark-mode {
+            background-color: black;
+            color: white;
+        }
+
+        .dark-mode select, .dark-mode input {
+            background-color: gray;
+            color: white;
+        }
+
+        h1 {
+    text-align: center; /* Centers the heading */
+         }
+
+         @media screen and ()
+
+button {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    padding: 10px 15px;
+    background-color: white;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: gray;
+}
+
+
+
+    </style>
+</head>
+<body>
+    <h1>Country Flags</h1>
+    <select  id="slt" onclick="slt()" >
+        <option value="">Sort by population</option>
+        <option value="asc">asc</option>
+        <option value="dsc">dsc</option>
+    </select>
+    
+    <select id="regionFilter" onchange="filterByRegion()">
+        <option value="">Filter by Region</option>
+        <option value="Asia">Asia</option>
+        <option value="Europe">Europe</option>
+        <option value="Africa">Africa</option>
+        <option value="Americas">Americas</option>
+        <option value="Oceania">Oceania</option>
+    </select>
+
+    
+    <input type="text" id="searchBox" oninput="searchCountry()" placeholder="Search country">
+
+    <button onclick="toggleDarkMode()">🌑🌑</button>
+
+    <br>
+    <div id="cont"></div>
+</body>
+</html>
+
+<script>
+    let bag;
+    getData();
+    async function getData(){
+        
+        let data=await fetch("https://restcountries.com/v3.1/all") 
+        let ans=await data.json();
+        bag=ans;
+        console.log(ans);
+        displayFLag(ans);
+
+    }
+
+    function displayFLag(ans){
+        document.querySelector("#cont").innerText= ""
+        ans.forEach(e1 => {
+            let box=document.createElement("div");
+
+            let img1=document.createElement("img");
+            img1.setAttribute("src",e1.flags.png);
+
+            let name=document.createElement("h4");
+            name.innerText=e1.name.common;
+
+            let PNo=document.createElement("p");
+            PNo.innerText=`population: ${e1.population}`;
+
+            let reg=document.createElement("p");
+            reg.innerText=`region: ${e1.region}`;
+
+            let Cap=document.createElement("p");
+            Cap.innerText=`Capital: ${e1.capital}`;
+
+
+
+
+
+            box.append(img1, name, PNo, reg, Cap)
+            document.querySelector("#cont").append(box);
+            
+        });
+    }
+
+    function slt(){
+        // console.log(document.querySelector("#slt").value)
+        let sltValue = document.querySelector("#slt").value;
+
+        if(sltValue=="asc"){
+            let sortData = bag.sort((a,b)=>a.population-b.population);
+            displayFLag(sortData) ;
+        } else if (sltValue=="dsc"){
+            let sortData = bag.sort((b,a)=>a.population-b.population);
+            displayFLag(sortData);
+        }
+        
+
+    }
+
+    function filterByRegion() {
+       let region = document.querySelector("#regionFilter").value;
+       let filteredData = region ? bag.filter(country => country.region === region) : bag;
+       displayFLag(filteredData);
+    }
+
+    function searchCountry() {
+       let query = document.querySelector("#searchBox").value.toLowerCase();
+       let filteredData = bag.filter(country => country.name.common.toLowerCase().includes(query));
+       displayFLag(filteredData);
+    }
+
+    function toggleDarkMode() {
+       document.body.classList.toggle("dark-mode");
+    }
+
+
+    
+</script>
